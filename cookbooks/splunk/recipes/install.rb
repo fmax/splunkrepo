@@ -9,33 +9,34 @@
 
 rightscale_marker :begin
 
-log "installing Splunk"
+log "Installing Splunk"
 
-user node[:splunk][:user] do
+user "#{node[:splunk][:user]}" do
  action :create
- system true
- shell "/bin/bash"
-end 
+  system true
+   shell "/bin/bash"
+   end 
 
-directory node[:splunk][:installdir] do   
-   owner "#{node[:splunk][:user]}"
-   mode "0755"   
-   action :create 
-end 
+   directory node[:splunk][:installdir] do   
+     owner "#{node[:splunk][:user]}"
+       mode "0755"   
+         action :create 
+         end 
 
-remote_file "#{node[:splunk][:installdir]}/splunk.tar" do   
-   source node[:splunk][:installfile]
-   action :create_if_missing 
-end 
+         remote_file "#{node[:splunk][:installdir]}/splunk.tar" do   
+           source node[:splunk][:installfile]
+             action :create_if_missing 
+               end 
 
+               bash "install_splunk" do
+                cwd node[:splunk][:installdir]
+                 code <<-EOH
+                   tar -xvf splunk.tar
+                   EOH
+                   end 
 
-bash "install_splunk" do
-   cwd node[:splunk][:installdir]
-   code <<-EOH
-      tar -xvf splunk.tar
-   EOH
-end 
+                   package "tree"
 
-package "tree"
+                   log "The installation is complete" 
 
-rightscale_marker :end
+                   rightscale_marker :end
